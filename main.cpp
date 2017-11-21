@@ -15,7 +15,7 @@ int main() {
     const char smtp[] = "smtp.163.com";
     const char pop3[] = "pop3.163.com";
     char email[] = "15520793998@163.com";
-    char password[] = "Zhou9468";
+    char password[] = "abcd1234";
     char recvData[BUF_SIZE];
     mailSocket mail;
     map<int,char*> list;
