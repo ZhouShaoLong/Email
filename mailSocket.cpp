@@ -5,8 +5,9 @@
 #include <sys/socket.h>
 #include <iostream>
 #include <arpa/inet.h>
-#include <zconf.h>
 #include <netdb.h>
+#include <cstring>
+#include <unistd.h>
 #include "mailSocket.h"
 
 mailSocket::mailSocket() {
@@ -49,7 +50,7 @@ int mailSocket::recvData(char *recvBuf, int size) {
         std::cerr << "链接套接字没有被初始化" << std::endl;
         return -1;
     }
-    len = (int) recv(sockfd, recvBuf, size, 0);
+    len = (int) recv(sockfd, recvBuf, (size_t) size, 0);
     return len;
 }
 

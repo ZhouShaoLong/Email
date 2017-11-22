@@ -18,7 +18,7 @@ int main() {
     char password[] = "abcd1234";
     char recvData[BUF_SIZE];
     mailSocket mail;
-    map<int,char*> list;
+    map<int, string> list;
 
 
 //    smtp发送邮件部分
@@ -54,9 +54,10 @@ int main() {
         cout << "登录成功" << endl;
     }
     manager.listMail(&list);
-    for (int i = 1; i <= list.size() ; ++i) {
-        cout<<list[i]<<endl;
+    for (int i = 1; i <= list.size(); ++i) {
+        cout << list[i] << endl;
     }
+    manager.detailMail("1");
 
     return 0;
 }

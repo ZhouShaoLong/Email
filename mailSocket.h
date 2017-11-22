@@ -7,8 +7,6 @@
 
 #include <netinet/in.h>
 
-#define TIMEOUT 3000
-//设置recv的超时时间为3s
 
 class mailSocket {
 public:

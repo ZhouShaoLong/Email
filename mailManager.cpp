@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <cstring>
 #include "mailManager.h"
 
 using namespace std;
@@ -102,7 +103,7 @@ int mailManager::sendMail(const char *recipients, const char *subject, const cha
     return 0;
 }
 
-int mailManager::listMail(std::map<int, char *> *map1) {
+int mailManager::listMail(std::map<int, string> *map1) {
     list.clear();
     string temp;
     char *p;
@@ -121,12 +122,38 @@ int mailManager::listMail(std::map<int, char *> *map1) {
         if (*p == '.') {
             break;
         }
-        map1->insert(pair<int, char *>(i, p));
+        temp = p;
+        map1->insert(pair<int, string>(i, temp));
+        //TODO 杨旭的任务：这里是得到的列表，使用top能够得到邮件的头部信息，解码存放到map1中
+        socket->sendData("top 1");
+
     }
 
-    socket->sendData("quit\r\n");
-    socket->recvData(recvData, BUF_SIZE);
-
-
     return (int) map1->size();
+}
+
+//获取邮件正文，填入的参数是序号，序号是获取邮件列表的时候得到的
+int mailManager::detailMail(char *index) {
+    int i = 0, bytes = 0;
+    cout << "-----邮件内容-----" << endl;
+    char a[100] = "retr ";
+    strcat(a, index);
+    socket->sendData(a);
+    socket->sendData("\r\n");
+    socket->recvData(recvData, 17);
+    if (strncmp(recvData, "+OK", 3) == 0) {
+        cout << "获取邮件正文成功" << endl;
+        while (recvData[i + 4] >= '0' && recvData[i + 4] <= '9') {
+            bytes = bytes * 10 + (recvData[i + 4] - '0');
+            i++;
+        }
+    } else if(strncmp(recvData, "-ERR", 4) == 0){
+        return 0;
+    }
+    cout << "邮件内容有 " << bytes << " 字节" << endl;
+    context = new char[bytes + 1];
+    socket->recvData(context, bytes + 1);
+    cout << context << endl;
+    //TODO 杨旭的任务：context里存放的是邮件的头部和正文，将正文解码出来
+    return bytes;
 }
