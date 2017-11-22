@@ -5,8 +5,9 @@
 #include <sys/socket.h>
 #include <iostream>
 #include <arpa/inet.h>
-#include <zconf.h>
 #include <netdb.h>
+#include <cstring>
+#include <unistd.h>
 #include "mailSocket.h"
 
 mailSocket::mailSocket() {

@@ -7,7 +7,7 @@
 
 #include <string>
 
-std::string base64_encode(const char const* , int len);
+std::string base64_encode(const char * , int len);
 std::string base64_decode(std::string const& s);
 
 #endif //LAB01_BASE64_H
