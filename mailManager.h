@@ -22,6 +22,7 @@ public:
     int sendMail(const char *recipients, const char *subject, const char *content);
     int listMail(std::map<int, string> *);
     int detailMail(char *index);
+    ~mailManager();
 
 private:
     const char *email, *password;
