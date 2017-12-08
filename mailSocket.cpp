@@ -50,6 +50,10 @@ int mailSocket::recvData(char *recvBuf, int size) {
         std::cerr << "链接套接字没有被初始化" << std::endl;
         return -1;
     }
+
+    struct timeval timeout = {3,0};
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout,sizeof(struct timeval));
+
     len = (int) recv(sockfd, recvBuf, (size_t) size, 0);
     return len;
 }

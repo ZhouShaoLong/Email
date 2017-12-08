@@ -5,7 +5,10 @@
 #ifndef LAB01_MAILMANAGER_H
 #define LAB01_MAILMANAGER_H
 
+#include <iostream>
+#include <cstring>
 #include <map>
+#include <list>
 #include "mailSocket.h"
 #include "base64.h"
 
@@ -13,6 +16,10 @@
 
 using namespace std;
 
+struct FILEINFO{
+    char fname[128];
+    char fpath[256];
+};
 
 class mailManager {
 public:
@@ -20,14 +27,19 @@ public:
     bool login_smtp(const char *email, const char *password);
     bool login_pop3(const char *email, const char *password);
     int sendMail(const char *recipients, const char *subject, const char *content);
-    int listMail(std::map<int, string> *);
+    int listMail(map<int, string> *list);
     int detailMail(char *index);
+    int addAttachment(const char *file);
+    int deleteAttachment(const char *file);
+    int deleteAllAttachment();
+    ~mailManager();
 
 private:
     const char *email, *password;
     mailSocket *socket;
     char sendData[BUF_SIZE], recvData[BUF_SIZE];
-    std::map<int, string> list;
+    std::map<int, string> map;
+    std::list<FILEINFO *> list;
     char *context;
     char *top;
 };
