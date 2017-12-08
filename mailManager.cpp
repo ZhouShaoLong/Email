@@ -2,8 +2,6 @@
 // Created by 周绍龙 on 2017/11/15.
 //
 
-#include <iostream>
-#include <cstring>
 #include "mailManager.h"
 
 using namespace std;
@@ -54,13 +52,16 @@ bool mailManager::login_smtp(const char *email, const char *password) {
 }
 
 bool mailManager::login_pop3(const char *email, const char *password) {
+    this->email = email;
+    this->password = password;
+
     socket->sendData("user ");
-    socket->sendData(email);
+    socket->sendData(this->email);
     socket->sendData("\r\n");
     socket->recvData(recvData, BUF_SIZE);
 
     socket->sendData("pass ");
-    socket->sendData(password);
+    socket->sendData(this->password);
     socket->sendData("\r\n");
     socket->recvData(recvData, BUF_SIZE);
 
@@ -87,7 +88,6 @@ int mailManager::sendMail(const char *recipients, const char *subject, const cha
 
     socket->sendData("data\r\n");
     socket->recvData(recvData, BUF_SIZE);
-    cout << recvData << endl;
 
     sendString = "From: ";
     sendString += email;
@@ -114,24 +114,34 @@ int mailManager::sendMail(const char *recipients, const char *subject, const cha
     sendString += "Content-Type: text/plain;";
     sendString += "charset=\"gb2312\"\r\n\r\n";
     sendString += content;
-    sendString +="\r\n\r\n";
+    sendString += "\r\n\r\n";
 
     socket->sendData(sendString.c_str());
 
-    sendString ="--qwert--";
+    sendString = "--qwert--";
     sendString += "\r\n.\r\n";
 
     socket->sendData(sendString.c_str());
-
-    socket->sendData("quit\r\n");
     socket->recvData(recvData, BUF_SIZE);
-    cout << "Server : " << recvData << endl;
 
     return 0;
 }
 
+int mailManager::addAttachment(const char *file) {
+
+    return 0;
+}
+
+int mailManager::deleteAttachment(const char *file) {
+    return 0;
+}
+
+int mailManager::deleteAllAttachment() {
+    return 0;
+}
+
 int mailManager::listMail(std::map<int, string> *map1) {
-    list.clear();
+    map.clear();
     string temp;
     char *p;
     int i = 0;
@@ -167,7 +177,7 @@ int mailManager::detailMail(char *index) {
     strcat(a, index);
     socket->sendData(a);
     socket->sendData("\r\n");
-    socket->recvData(recvData, 17);
+    socket->recvData(recvData, 18);
     if (strncmp(recvData, "+OK", 3) == 0) {
         cout << "获取邮件正文成功" << endl;
         while (recvData[i + 4] >= '0' && recvData[i + 4] <= '9') {
@@ -179,12 +189,19 @@ int mailManager::detailMail(char *index) {
     }
     cout << "邮件内容有 " << bytes << " 字节" << endl;
     context = new char[bytes + 1];
-    socket->recvData(context, bytes + 1);
-    cout << context << endl;
+
+    while (socket->recvData(recvData, BUF_SIZE) > 0) {
+        strncat(context, recvData, BUF_SIZE);
+        memset(recvData, 0, BUF_SIZE);
+    }
+
+    cout << context;
+
     //TODO 杨旭的任务：context里存放的是邮件的头部和正文，将正文解码出来
     return bytes;
 }
 
 mailManager::~mailManager() {
     socket->sendData("quit\r\n");
+    socket->recvData(recvData, BUF_SIZE);
 }
