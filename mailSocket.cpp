@@ -44,6 +44,16 @@ int mailSocket::sendData(const char *sendBuf) {
     return len;
 }
 
+int mailSocket::sendDataSSL(const char *sendBuf) {
+    int len = -1;
+    if (sockfd < 0) {
+        std::cerr << "链接套接字没有被初始化" << std::endl;
+        return -1;
+    }
+    len = SSL_write(ssl, sendBuf, strlen(sendBuf));
+    return len;
+}
+
 int mailSocket::recvData(char *recvBuf, int size) {
     int len = -1;
     if (sockfd < 0) {
@@ -58,6 +68,62 @@ int mailSocket::recvData(char *recvBuf, int size) {
     return len;
 }
 
+int mailSocket::recvDataSSL(char *recvBuf, int size) {
+    int len = -1;
+    if (sockfd < 0) {
+        std::cerr << "链接套接字没有被初始化" << std::endl;
+        return -1;
+    }
+    len = SSL_read(ssl, recvBuf, size);
+    return len;
+}
+
 mailSocket::~mailSocket() {
     close(sockfd);
+}
+
+void mailSocket::ShowCerts(SSL * ssl)
+{
+    X509 *cert;
+    char *line;
+
+    cert = SSL_get_peer_certificate(ssl);
+    if (cert != NULL) {
+        printf("数字证书信息:\n");
+        line = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
+        printf("证书: %s\n", line);
+        free(line);
+        line = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
+        printf("颁发者: %s\n", line);
+        free(line);
+        X509_free(cert);
+    } else
+        printf("无证书信息！\n");
+}
+
+void mailSocket::initSSL()
+{
+    /* SSL 库初始化*/
+    SSL_library_init();
+    OpenSSL_add_all_algorithms();
+    SSL_load_error_strings();
+    ctx = SSL_CTX_new(SSLv23_client_method());
+    if (ctx == NULL) {
+        ERR_print_errors_fp(stdout);
+        exit(1);
+    }
+}
+
+void mailSocket::createSSL()
+{
+    /* 基于 ctx 产生一个新的 SSL */
+    ssl = SSL_new(ctx);
+    SSL_set_fd(ssl, sockfd);
+    /* 建立 SSL 连接 */
+    if (SSL_connect(ssl) == -1)
+        ERR_print_errors_fp(stderr);
+    else {
+        printf("Connected with %s encryption\n", SSL_get_cipher(ssl));
+        ShowCerts(ssl);
+    }
 }

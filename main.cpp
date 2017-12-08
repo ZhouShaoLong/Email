@@ -6,7 +6,7 @@
 
 #define BUF_SIZE 1024
 #define SMTP_PORT 25
-#define POP3_PORT 110
+#define POP3_PORT 995   //无ssl为110 有ssl为995
 
 using namespace std;
 
@@ -50,14 +50,16 @@ int main() {
     }
     mail.recvData(recvData, BUF_SIZE);
     mailManager manager(&mail);
-    if (manager.login_pop3(email, password)) {
+    mail.initSSL();
+    mail.createSSL();
+    if (manager.login_pop3SSL(email, password)) {
         cout << "登录成功" << endl;
     }
-    manager.listMail(&list);
+    manager.listMailSSL(&list);
     for (int i = 1; i <= list.size(); ++i) {
         cout << list[i] << endl;
     }
-    manager.detailMail("1");
+    manager.detailMailSSL("1");
 
     return 0;
 }

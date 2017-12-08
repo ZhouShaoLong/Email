@@ -26,9 +26,12 @@ public:
     explicit mailManager(mailSocket *socket);
     bool login_smtp(const char *email, const char *password);
     bool login_pop3(const char *email, const char *password);
+    bool login_pop3SSL(const char *email, const char *password);
     int sendMail(const char *recipients, const char *subject, const char *content);
     int listMail(map<int, string> *list);
+    int listMailSSL(map<int, string> *list);
     int detailMail(char *index);
+    int detailMailSSL(char *index);
     int addAttachment(const char *file);
     int deleteAttachment(const char *file);
     int deleteAllAttachment();
