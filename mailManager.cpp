@@ -148,6 +148,61 @@ int mailManager::sendMail(const char *recipients, const char *subject, const cha
     return 0;
 }
 
+int mailManager::sendMailSSL(const char *recipients, const char *subject, const char *content) {
+
+    string sendString;
+
+    socket->sendDataSSL("mail from <");
+    socket->sendDataSSL(email);
+    socket->sendDataSSL(">\r\n");
+    socket->recvDataSSL(recvData, BUF_SIZE);
+
+    socket->sendDataSSL("rcpt to <");
+    socket->sendDataSSL(recipients);
+    socket->sendDataSSL(">\r\n");
+    socket->recvDataSSL(recvData, BUF_SIZE);
+
+    socket->sendDataSSL("data\r\n");
+    socket->recvDataSSL(recvData, BUF_SIZE);
+
+    sendString = "From: ";
+    sendString += email;
+    sendString += "\r\n";
+
+    sendString += "To: ";
+    sendString += recipients;
+    sendString += "\r\n";
+
+    sendString += "Subject: ";
+    sendString += subject;
+    sendString += "\r\n";
+
+    sendString += "MIME-Version: 1.0";
+    sendString += "\r\n";
+
+    sendString += "Content-Type: multipart/mixed;boundary=qwert";
+    sendString += "\r\n";
+    sendString += "\r\n";
+
+    socket->sendDataSSL(sendString.c_str());
+
+    sendString = "--qwert\r\n";
+    sendString += "Content-Type: text/plain;";
+    sendString += "charset=\"gb2312\"\r\n\r\n";
+    sendString += content;
+    sendString += "\r\n\r\n";
+
+    socket->sendDataSSL(sendString.c_str());
+
+    sendString = "--qwert--";
+    sendString += "\r\n.\r\n";
+
+    socket->sendDataSSL(sendString.c_str());
+    socket->recvDataSSL(recvData, BUF_SIZE);
+    cout << recvData;
+    return 0;
+}
+
 int mailManager::addAttachment(const char *file) {
 
     return 0;
