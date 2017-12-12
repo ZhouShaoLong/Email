@@ -205,22 +205,20 @@ int mailManager::listMailSSL(std::map<int, string> *map1) {
         socket->recvDataSSL(recvData,BUF_SIZE);
     }
     cout<<recvData;
-/*    p = strtok(recvData, "\r\n");
+    p = strtok(recvData, "\r\n");
     while (p) {
         i++;
-        p = strtok(nullptr, "\r\n");
-        if (*p == '.') {
+        if (*p == '.'|| *p == '\0') {
             break;
         }
         temp = p;
         map1->insert(pair<int, string>(i, temp));
+        p = strtok(nullptr, "\r\n");
         //TODO 杨旭的任务：这里是得到的列表，使用top能够得到邮件的头部信息，解码存放到map1中
 //        socket->sendData("top 1");
 
     }
-
-    return (int) map1->size();*/
-    return 5;
+    return (int) map1->size();
 }
 
 //获取邮件正文，填入的参数是序号，序号是获取邮件列表的时候得到的

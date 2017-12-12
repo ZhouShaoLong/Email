@@ -61,6 +61,6 @@ int main() {
     for (int i = 1; i <= list.size(); ++i) {
         cout << list[i] << endl;
     }*/
-    manager.detailMailSSL("1");
+    manager.listMailSSL(&list);
     return 0;
 }
