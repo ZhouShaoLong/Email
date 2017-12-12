@@ -125,6 +125,5 @@ void mailSocket::createSSL()
         ERR_print_errors_fp(stderr);
     else {
         printf("Connected with %s encryption\n", SSL_get_cipher(ssl));
-        ShowCerts(ssl);
     }
 }

@@ -51,6 +51,41 @@ bool mailManager::login_smtp(const char *email, const char *password) {
     return true;
 }
 
+bool mailManager::login_smtpSSL(const char *email, const char *password) {
+    int retCode = 0, i = 0;
+
+    this->email = email;
+    this->password = password;
+
+    socket->sendDataSSL("HELO ");
+    //HELO后面有个空格
+    socket->sendDataSSL(email);
+    socket->sendDataSSL("\r\n");
+    socket->recvDataSSL(recvData, BUF_SIZE);
+    socket->recvDataSSL(recvData, BUF_SIZE);  //helo后要接收两句
+
+    socket->sendDataSSL("auth login\r\n");
+    socket->recvDataSSL(recvData, BUF_SIZE);
+
+    socket->sendDataSSL(base64_encode((char *)email, (int)strlen(email)).c_str());
+    socket->sendDataSSL("\r\n");
+    socket->recvDataSSL(recvData, BUF_SIZE);
+
+    socket->sendDataSSL(base64_encode((char *)password, (int)strlen(password)).c_str());
+    socket->sendDataSSL("\r\n");
+    socket->recvDataSSL(recvData, BUF_SIZE);
+
+    for (i = 0; i < 3; ++i) {
+        retCode = retCode * 10 + (recvData[i] - '0');
+    }
+
+    if (retCode != 235) {
+        std::cout << "error : " << recvData << std::endl;
+        return false;
+    }
+    return true;
+}
+
 bool mailManager::login_pop3(const char *email, const char *password) {
     this->email = email;
     this->password = password;

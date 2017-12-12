@@ -25,6 +25,7 @@ class mailManager {
 public:
     explicit mailManager(mailSocket *socket);
     bool login_smtp(const char *email, const char *password);
+    bool login_smtpSSL(const char *email, const char *password);
     bool login_pop3(const char *email, const char *password);
     bool login_pop3SSL(const char *email, const char *password);
     int sendMail(const char *recipients, const char *subject, const char *content);
