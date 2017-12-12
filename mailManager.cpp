@@ -258,7 +258,7 @@ int mailManager::detailMail(char *index) {
 int mailManager::detailMailSSL(char *index) {
     int i = 0, bytes = 0;
     cout << "-----邮件内容-----" << endl;
-/*    char a[100] = "list ";
+    char a[100] = "list ";
     strcat(a, index);
     strcat(a, "\r\n");
     socket->sendDataSSL(a);
@@ -278,16 +278,18 @@ int mailManager::detailMailSSL(char *index) {
         cout<<"获取邮件失败";
         return 0;
     }
-    cout << "邮件内容有 " << bytes << " 字节" << endl;*/
+    cout << "邮件内容有 " << bytes << " 字节" << endl;
     char b[100] = "retr ";
     strcat(b, index);
     strcat(b, "\r\n");
     socket->sendDataSSL(b);
     socket->recvDataSSL(recvData, BUF_SIZE);
-    cout<<recvData;
     socket->sendDataSSL(b);
     socket->recvDataSSL(recvData, BUF_SIZE);
-    cout<<recvData;
+    //前两次的retr消息将只得到ok的返回，第三次才是正文
+    socket->sendDataSSL(b);
+    socket->recvDataSSL(recvData, BUF_SIZE);
+    cout << recvData;
 /*    while (socket->recvDataSSL(recvData, BUF_SIZE) > 0) {
         strncat(context, recvData, BUF_SIZE);
         memset(recvData, 0, BUF_SIZE);
