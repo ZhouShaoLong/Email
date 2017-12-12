@@ -12,7 +12,7 @@
 #include "mailSocket.h"
 #include "base64.h"
 
-#define BUF_SIZE 1024
+#define BUF_SIZE 102400
 
 using namespace std;
 
@@ -35,12 +35,15 @@ public:
     int addAttachment(const char *file);
     int deleteAttachment(const char *file);
     int deleteAllAttachment();
+    void testSSL();
+    void recvDuplicateMsg();
     ~mailManager();
 
 private:
     const char *email, *password;
     mailSocket *socket;
     char sendData[BUF_SIZE], recvData[BUF_SIZE];
+    char testmsg[BUF_SIZE];
     std::map<int, string> map;
     std::list<FILEINFO *> list;
     char *context;

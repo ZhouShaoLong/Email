@@ -12,32 +12,34 @@ using namespace std;
 
 int main() {
     int ret = 0;
-    const char smtp[] = "smtp.163.com";
-    const char pop3[] = "pop3.163.com";
-    char email[] = "15520793998@163.com";
-    char password[] = "abcd1234";
+    const char smtp[] = "smtp.qq.com";
+    const char pop3[] = "pop.qq.com";
+    //char email[] = "18756645662@163.com";
+    //char password[] = "xmf1261616671";
+    char email[] = "menfer@foxmail.com";
+    char password[] = "kqklxgrsfwyuffja";
     char recvData[BUF_SIZE];
     mailSocket mail;
     map<int, string> list;
 
 
-//    smtp发送邮件部分
-//    ret = mail.Connect(smtp, SMTP_PORT);
-//    if (ret != 1) {
-//        cout << "Client : Connect 连接失败" << endl;
-//        exit(-1);
-//    } else {
-//        cout << "Client : " << smtp << " 连接成功 " << endl;
-//    }
-//    mail.recvData(recvData, BUF_SIZE);
-//
-//    mailManager manager(&mail);
-//
-//    if (manager.login_smtp(email, password)) {
-//        cout << "登录成功" << endl;
-//    }
-//
-//    manager.sendMail("1281188154@qq.com", "Hello", "1111");
+    //smtp发送邮件部分
+/*    ret = mail.Connect(smtp, SMTP_PORT);
+    if (ret != 1) {
+        cout << "Client : Connect 连接失败" << endl;
+        exit(-1);
+    } else {
+        cout << "Client : " << smtp << " 连接成功 " << endl;
+    }
+    mail.recvData(recvData, BUF_SIZE);
+
+    mailManager manager(&mail);
+
+    if (manager.login_smtp(email, password)) {
+        cout << "登录成功" << endl;
+    }
+
+    manager.sendMail("15520793998@163.com", "Hello", "1111");*/
 
 
 //    pop3接收邮件部分
@@ -55,11 +57,10 @@ int main() {
     if (manager.login_pop3SSL(email, password)) {
         cout << "登录成功" << endl;
     }
-    manager.listMailSSL(&list);
+/*    manager.listMailSSL(&list);
     for (int i = 1; i <= list.size(); ++i) {
         cout << list[i] << endl;
-    }
+    }*/
     manager.detailMailSSL("1");
-
     return 0;
 }

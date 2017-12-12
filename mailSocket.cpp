@@ -74,6 +74,7 @@ int mailSocket::recvDataSSL(char *recvBuf, int size) {
         std::cerr << "链接套接字没有被初始化" << std::endl;
         return -1;
     }
+    memset(recvBuf, 0, 102400);
     len = SSL_read(ssl, recvBuf, size);
     return len;
 }

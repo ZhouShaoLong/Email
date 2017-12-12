@@ -64,7 +64,6 @@ bool mailManager::login_pop3(const char *email, const char *password) {
     socket->sendData(this->password);
     socket->sendData("\r\n");
     socket->recvData(recvData, BUF_SIZE);
-
     if (strncmp(recvData, "+OK", 3) == 0) {
         return true;
     } else if (strncmp(recvData, "+ERR", 4) == 0) {
@@ -80,12 +79,13 @@ bool mailManager::login_pop3SSL(const char *email, const char *password) {
     socket->sendDataSSL(this->email);
     socket->sendDataSSL("\r\n");
     socket->recvDataSSL(recvData, BUF_SIZE);
-
+    cout<<"user :"<<recvData;
     socket->sendDataSSL("pass ");
     socket->sendDataSSL(this->password);
     socket->sendDataSSL("\r\n");
     socket->recvDataSSL(recvData, BUF_SIZE);
-
+    cout<<"pass: "<<recvData;
+    int mynum = socket->recvDataSSL(testmsg, BUF_SIZE);
     if (strncmp(recvData, "+OK", 3) == 0) {
         return true;
     } else if (strncmp(recvData, "+ERR", 4) == 0) {
@@ -197,16 +197,15 @@ int mailManager::listMailSSL(std::map<int, string> *map1) {
     string temp;
     char *p;
     int i = 0;
-
-    socket->sendDataSSL("stat\r\n");
-    socket->recvDataSSL(recvData, BUF_SIZE);
-
     socket->sendDataSSL("list\r\n");
     socket->recvDataSSL(recvData, BUF_SIZE);
-    cout<<recvData<<endl;
-    socket->recvDataSSL(recvData, BUF_SIZE);
-    cout<<recvData<<endl;
-    p = strtok(recvData, "\r\n");
+    while (strcmp(recvData,"+OK\r\n")==0||strlen(recvData)==0)
+    {
+        socket->sendDataSSL("list\r\n");
+        socket->recvDataSSL(recvData,BUF_SIZE);
+    }
+    cout<<recvData;
+/*    p = strtok(recvData, "\r\n");
     while (p) {
         i++;
         p = strtok(nullptr, "\r\n");
@@ -220,7 +219,8 @@ int mailManager::listMailSSL(std::map<int, string> *map1) {
 
     }
 
-    return (int) map1->size();
+    return (int) map1->size();*/
+    return 5;
 }
 
 //获取邮件正文，填入的参数是序号，序号是获取邮件列表的时候得到的
@@ -258,30 +258,40 @@ int mailManager::detailMail(char *index) {
 int mailManager::detailMailSSL(char *index) {
     int i = 0, bytes = 0;
     cout << "-----邮件内容-----" << endl;
-    char a[100] = "retr ";
+/*    char a[100] = "list ";
     strcat(a, index);
+    strcat(a, "\r\n");
     socket->sendDataSSL(a);
-    socket->sendDataSSL("\r\n");
-    socket->recvDataSSL(recvData, 18);
+    socket->recvDataSSL(recvData,BUF_SIZE);
+    while (strcmp(recvData,"+OK\r\n")==0||strlen(recvData)==0)
+    {
+        socket->sendDataSSL(a);
+        socket->recvDataSSL(recvData,BUF_SIZE);
+    }
     if (strncmp(recvData, "+OK", 3) == 0) {
         cout << "获取邮件正文成功" << endl;
-        while (recvData[i + 4] >= '0' && recvData[i + 4] <= '9') {
-            bytes = bytes * 10 + (recvData[i + 4] - '0');
+        while (recvData[i + 6] >= '0' && recvData[i + 6] <= '9') {
+            bytes = bytes * 10 + (recvData[i + 6] - '0');
             i++;
         }
     } else if (strncmp(recvData, "-ERR", 4) == 0) {
+        cout<<"获取邮件失败";
         return 0;
     }
-    cout << "邮件内容有 " << bytes << " 字节" << endl;
-    context = new char[bytes + 1];
-
-    while (socket->recvDataSSL(recvData, BUF_SIZE) > 0) {
+    cout << "邮件内容有 " << bytes << " 字节" << endl;*/
+    char b[100] = "retr ";
+    strcat(b, index);
+    strcat(b, "\r\n");
+    socket->sendDataSSL(b);
+    socket->recvDataSSL(recvData, BUF_SIZE);
+    cout<<recvData;
+    socket->sendDataSSL(b);
+    socket->recvDataSSL(recvData, BUF_SIZE);
+    cout<<recvData;
+/*    while (socket->recvDataSSL(recvData, BUF_SIZE) > 0) {
         strncat(context, recvData, BUF_SIZE);
         memset(recvData, 0, BUF_SIZE);
-    }
-
-    cout << context;
-
+    }*/
     //TODO 杨旭的任务：context里存放的是邮件的头部和正文，将正文解码出来
     return bytes;
 }
@@ -289,4 +299,21 @@ int mailManager::detailMailSSL(char *index) {
 mailManager::~mailManager() {
     socket->sendData("quit\r\n");
     socket->recvData(recvData, BUF_SIZE);
+}
+
+void mailManager::testSSL() {
+    cout<<"----------Test SSL----------"<<endl;
+    socket->sendDataSSL("RETR 2\r\n");
+    socket->recvDataSSL(recvData,BUF_SIZE);
+    while (strcmp(recvData,"+OK\r\n")==0||strlen(recvData)==0)
+    {
+        socket->sendDataSSL("RETR 2\r\n");
+        socket->recvDataSSL(recvData,BUF_SIZE);
+    }
+    cout<<recvData;
+    cout<<"--------Test SSL END--------"<<endl;
+}
+
+void mailManager::recvDuplicateMsg(){
+    socket->recvDataSSL(recvData, 1024);
 }
